@@ -52,16 +52,19 @@
 <body>
 
     
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<!-- Image Modal -->
+<div class="modal fade" id="SendPhotosModel" tabindex="-1" aria-labelledby="SendPhotosModelLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Share Photos</h1>
+          <h1 class="modal-title fs-5" id="SendPhotosModelLabel">Share Photos</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
-            <input type="file" name="f1" id="f1" accept="image/*">
+        <div class="modal-body" style="display: flex; justify-content: center; align-items: center;">
+            <div style="position: relative; height: 200px; width: 600px; line-height: 30px; text-align: center;" > 
+                <img id="imgPrev" src="https://img.icons8.com/clouds/200/upload.png" alt="" style="height: 90%; aspect-ratio: auto;">
+                <input type="file" id="f1" onchange="loadFile(event)" style="opacity: 0.0; position: absolute; top: 0; left: 0; bottom: 0; right: 0; width: 100%; height:100%;" />
+            </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -73,8 +76,8 @@
 
 
     <div style="display: flex;">
-        <div style="width: 30vw; max-height: 100vh; position: relative; padding: 5px;">
-            Your peer ID is: <span id="pid"></span><br>
+        <div style="width: 30vw; max-height: 100vh; position: relative; padding: 5px 0 0 15px;">
+            Your peer ID is: <span style="font-weight: 700;" id="pid"></span><br>
     <div class="input-group mb-3">
         <input id="fid" type="text" class="form-control" placeholder="Friend's ID..." aria-label="Recipient's username" aria-describedby="basic-addon2">
         <div class="input-group-append">
@@ -88,8 +91,8 @@
                 <div class="input-group" style="position:absolute; bottom:10px; padding: 0 5px 0 5px; width: 100%;" class="sendSection">
                     <input type="text" name="msg" id="msg" class="form-control" placeholder="message..." aria-label="Recipient's username" aria-describedby="basic-addon2">
                     <div class="input-group-append">
-                      <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal" type="button">Images</button>
-                      <button class="btn btn-secondary" onclick="send()" id="sendbtn"  type="button">Send</button>
+                      <button class="btn btn-secondary " id="imagebtn" data-bs-toggle="modal" data-bs-target="#SendPhotosModel" type="button">Images</button>
+                      <button class="btn btn-secondary disabled" onclick="send()" id="sendbtn"  type="button">Send</button>
                     </div>
 
             </div>
@@ -103,9 +106,9 @@
             </div>
             
             <div style="display: flex; justify-content: center; align-items: center;">
-                <button class="callbtn btn btn-success" onclick="Call()">Make Call</button>
-                <button class="callbtn btn btn-secondary">Mute</button>
-                <button class="callbtn btn btn-danger">Cut Call</button>
+                <button class="callbtn disabled btn btn-success" id="makecall" onclick="Call()">Make Call</button>
+                <button class="callbtn disabled btn btn-secondary" id="mutecall" data-bs-toggle="modal" data-bs-target="#ConnectionRequest">Mute</button>
+                <button class="callbtn disabled btn btn-danger" id="cutcall" >Cut Call</button>
             </div>
         </div>
     </div>
@@ -113,9 +116,23 @@
     
 
     <script>
-        // var myPeerId = window.prompt("Enter your peer ID");
-        var myPeerId = null;
-        var peer = new Peer();
+        var myPeerId
+        if(localStorage.getItem("peerid") === null){
+            myPeerId = window.prompt("Enter your peer ID");
+            localStorage.setItem("peerid", myPeerId);
+        }else{
+            myPeerId = localStorage.getItem("peerid");
+        }
+        
+        var loadFile = function(event) {
+            var output = document.getElementById('imgPrev');
+            output.src = URL.createObjectURL(event.target.files[0]);
+            output.onload = function() {
+            URL.revokeObjectURL(output.src) 
+            }
+        };
+
+        var peer = new Peer(myPeerId);
         var fid;
         setTimeout(() => {
             console.log(peer);
@@ -144,8 +161,14 @@
             fid = document.getElementById('fid').value;
             conn = peer.connect(fid);
             conn.on('open', function(){
+                fid = document.getElementById('fid').value;
                 conn.send('Connected!!!');
             });
+            document.getElementById('mutecall').classList.remove("disabled");
+            document.getElementById('makecall').classList.remove("disabled");
+            document.getElementById('cutcall').classList.remove("disabled");
+            document.getElementById('sendbtn').classList.remove("disabled");
+            // document.getElementById('imagebtn').classList.remove("disabled");
         }
 
         // Receive Message or File
@@ -166,7 +189,7 @@
                     document.getElementById('chat').appendChild(img)
                     document.getElementById('chat').appendChild(document.createElement('br'))
 
-                }else if(document.getElementById('chat').childElementCount === 0 && data === "Connected!!!"){
+                }else if(data === "Connected!!!"){
                     var li = document.createElement('li')
                     li.innerText = `${document.getElementById('fid').value} : ` + data;
                     li.setAttribute("class", "list-group-item active");
@@ -174,7 +197,7 @@
                     document.getElementById('chat').appendChild(li)
                 }else{
                     var li = document.createElement('li')
-                    li.innerText = `${document.getElementById('fid').value} : ` + data;
+                    li.innerText = `${document.getElementById('fid').value}: ` + data;
                     li.setAttribute("class", "list-group-item");
                     console.log(li)
                     document.getElementById('chat').appendChild(li)
@@ -207,7 +230,6 @@
         // Make call
 
         function Call(){
-            var fid = document.getElementById('fid').value;
             var getUserMedia = navigator.getUserMedia;
             getUserMedia({video: true, audio: true}, function(stream) {
                 var video = document.getElementById('mevideo');
@@ -250,7 +272,6 @@
                 document.getElementById('f1').value = null;
             }
             updateScroll();
-
         }
 
     </script>
