@@ -47,24 +47,56 @@
             margin: 10px;
             width: 10vw;
         }
-
-
     </style>
 </head>
 <body>
+
+    
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Share Photos</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <input type="file" name="f1" id="f1" accept="image/*">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="send()" data-bs-dismiss="modal">Send Photo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
     <div style="display: flex;">
-        <div style="width: 30vw; max-height: 100vh; border: 1px solid black;">
+        <div style="width: 30vw; max-height: 100vh; position: relative; padding: 5px;">
             Your peer ID is: <span id="pid"></span><br>
-    Your Friend's peer ID is: <input type="text" name="fid" id="fid"> <button onclick="connect()">Connect</button><br>
+    <div class="input-group mb-3">
+        <input id="fid" type="text" class="form-control" placeholder="Friend's ID..." aria-label="Recipient's username" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" onclick="connect()" type="button">Connect</button>
+        </div>
+      </div>
+
             <h3>Chat</h3>
             <div class="list-group overflow-auto" id="chat">
             </div>
-            <div style="position:absolute; bottom:0; padding: 10px;">
-                <input type="text" name="msg" id="msg"><button>ICON</button>
-                <button onclick="send()" id="sendbtn">Send</button><br>
+                <div class="input-group" style="position:absolute; bottom:10px; padding: 0 5px 0 5px; width: 100%;" class="sendSection">
+                    <input type="text" name="msg" id="msg" class="form-control" placeholder="message..." aria-label="Recipient's username" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                      <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal" type="button">Images</button>
+                      <button class="btn btn-secondary" onclick="send()" id="sendbtn"  type="button">Send</button>
+                    </div>
+
             </div>
         </div>
-        <div style="width: 70vw; height: 100vh; border: 1px solid black;">
+
+        
+        <div style="width: 70vw; height: 100vh; ">
             <div style="position: relative; width: 100%; height: 90%; display: flex; justify-content: center; align-items: center;">
                 <video id="othervideo" autoplay></video>
                 <video id="mevideo" autoplay muted></video>
