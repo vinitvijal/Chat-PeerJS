@@ -30,7 +30,7 @@
         });
 
 
-
+        // Make Call
 
         function Call(){
             var fid = document.getElementById('fid').value;
@@ -49,6 +49,8 @@
             });
         }
 
+
+        // Recieve Call
         var getUserMedia = navigator.getUserMedia;
             peer.on('call', function(call) {
             getUserMedia({video: true, audio: true}, function(stream) {
@@ -66,11 +68,6 @@
             });
         });
 
-        // function send() {
-        //     var msg = document.getElementById('msg').value;
-        //     document.getElementById('chat').innerHTML += 'Me : ' + msg + '<br>';
-        //     conn.send(msg);
-        // }
         </script>
 </body>
 </html>
