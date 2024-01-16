@@ -157,9 +157,9 @@
 
         // Connect to peer
 
-        function connect() {
+        async function connect() {
             fid = document.getElementById('fid').value;
-            conn = peer.connect(fid);
+            conn = await peer.connect(fid);
             conn.on('open', function(){
                 fid = document.getElementById('fid').value;
                 conn.send('Connected!!!');
